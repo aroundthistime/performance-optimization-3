@@ -9,17 +9,30 @@ const LazyLoadImage = (props) => {
 
     const {
         src,
+        extraSrcs,
         ...restProps
     } = props;
 
     useEffect(() => {
         if (inView) {
-            entry.target.src = props.src;
+            [...entry.target.querySelectorAll('source')].forEach(source => {
+                source.srcset = source.dataset.srcset;
+            })
+            const img = entry.target.querySelector('img')
+            img.src = img.dataset.src;
         }
     }, [inView])
 
     return (
-        <img {...restProps} data-src={props.src} ref={ref}/>
+        <picture {...restProps} ref={ref}>
+            {extraSrcs && (
+                extraSrcs.map(extraSrc => (
+                    <source data-srcSet={extraSrc} key={extraSrc} />
+                ))
+            )}
+            <img data-src={src} key={src}/>
+        </picture>
+        
     )
 }
 
